@@ -70,6 +70,10 @@ Polynomial* poly_derivative(Polynomial *p) {
 
 // Calculate rem(A,B)
 Polynomial* poly_remainder(Polynomial *A,Polynomial *B) {
+    if (B->degree == 0) {
+        return 0;
+    }
+
     Polynomial *R = copy_polynomial(A);
 
     if (A->degree < B->degree) {
@@ -94,6 +98,13 @@ Polynomial* poly_remainder(Polynomial *A,Polynomial *B) {
     return R;
 }
 
+void poly_negative(Polynomial *p){
+    int k=p->degree+1;
+    for(int i=0;i<k;i++){
+        p->coeffs[i]*=-1;
+    }
+}
+
 // Calculate P(value)
 double poly_calculate(Polynomial *p, double value) {
     double result = 0.0;
@@ -105,4 +116,33 @@ double poly_calculate(Polynomial *p, double value) {
     }
 
     return result;
+}
+
+double cauchy_bound(Polynomial*p){
+    if (p->degree = 0) {
+        return 0.0;
+    }
+
+    double max=0.0;
+    int n=p->degree;
+
+    for (int i = 0; i < n; i++) {
+        double r = fabs(p->coeffs[i] / p->coeffs[n]);
+        if (r > max) {
+            max=r;
+        }
+    }
+
+    return max+1;
+}
+
+int nb_sign_change(double*l,int n){
+    int nb=0;
+    for(int i=1;i<n;i++){
+        if(l[i-1]*l[i]<0){
+            nb++;
+        }
+    }
+
+    return nb;
 }

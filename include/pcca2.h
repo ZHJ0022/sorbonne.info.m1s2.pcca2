@@ -25,4 +25,25 @@ Polynomial* copy_polynomial(const Polynomial *p);
 // Generate a random polynomial with coefficients in [min, max]
 Polynomial* generate_random_polynomial(int degree, double min, double max);
 
+// Calculate the derivative of the polynomial
+Polynomial* poly_derivative(Polynomial *p);
+
+// Calculate rem(A,B)
+Polynomial* poly_remainder(Polynomial *A,Polynomial *B);
+
+void poly_negative(Polynomial *p);
+
+// Calculate P(value)
+double poly_calculate(Polynomial *p, double value);
+
+double cauchy_bound(Polynomial*p);
+
+int nb_sign_change(double*l,int n);
+
+
+// function for sturm naif
+double* bound_recu(Polynomial**sturmSuite, int nbSuite,double inf, double sup);
+
+double* sturm_naif(Polynomial* p);
+
 #endif
