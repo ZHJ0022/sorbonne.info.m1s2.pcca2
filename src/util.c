@@ -49,3 +49,60 @@ Polynomial* generate_random_polynomial(int degree, double min, double max) {
 
     return p;
 }
+
+// Calculate the derivative of the polynomial
+Polynomial* poly_derivative(Polynomial *p) {
+    if (p->degree == 0) {
+        Polynomial *d = create_polynomial(0);
+        d->coeffs[0] = 0.0;
+        return d;
+    }
+
+    Polynomial *d = create_polynomial(p->degree - 1);
+
+    //(a_i * x_i)'=i * a_i * x^(i-1)
+    for (int i = 1; i <= p->degree; i++) {
+        d->coeffs[i - 1] = i * p->coeffs[i];
+    }
+
+    return d;
+}
+
+// Calculate rem(A,B)
+Polynomial* poly_remainder(Polynomial *A,Polynomial *B) {
+    Polynomial *R = copy_polynomial(A);
+
+    if (A->degree < B->degree) {
+        return R;
+    }
+
+    while (R->degree >= B->degree) {
+        int k = R->degree - B->degree;
+        double c = R->coeffs[R->degree] / B->coeffs[B->degree];
+
+        // R = R - c * x^k * B
+        for (int i = 0; i <= B->degree; i++) {
+            R->coeffs[i + k] -= c * B->coeffs[i];
+        }
+
+        // update degree
+        while (R->degree > 0 && R->coeffs[R->degree] == 0.0) {
+            R->degree--;
+        }
+    }
+
+    return R;
+}
+
+// Calculate P(value)
+double poly_calculate(Polynomial *p, double value) {
+    double result = 0.0;
+    double x = 1.0;     //x_0
+
+    for (int i = 0; i <= p->degree; i++) {
+        result += p->coeffs[i] * x;
+        x *= value;         //x_i+1
+    }
+
+    return result;
+}
