@@ -1,6 +1,6 @@
-// Create a polynomial
 #include "../include/pcca2.h"
 
+// Create a polynomial
 Polynomial* create_polynomial(int degree) {
     Polynomial *p = (Polynomial*)malloc(sizeof(Polynomial));
     if (!p) return NULL;
@@ -50,6 +50,23 @@ Polynomial* generate_random_polynomial(int degree, double min, double max) {
     return p;
 }
 
+// afficher the result of the sturm
+void afficher_bound(const double* bound) {
+    if (!bound) {
+        printf("bound = NULL\n");
+        return;
+    }
+
+    int n = (int)bound[0];
+    printf("Nombre de racines reelles (selon Sturm) = %d\n", n);
+
+    for (int i = 1; i <= n; i++) {
+        double a = bound[2*i - 1];
+        double b = bound[2*i];
+        printf("  Racine %d : [%.15g, %.15g]\n", i, a, b);
+    }
+}
+
 // Calculate the derivative of the polynomial
 Polynomial* poly_derivative(Polynomial *p) {
     if (p->degree == 0) {
@@ -71,7 +88,7 @@ Polynomial* poly_derivative(Polynomial *p) {
 // Calculate rem(A,B)
 Polynomial* poly_remainder(Polynomial *A,Polynomial *B) {
     if (B->degree == 0) {
-        return 0;
+        return create_polynomial(0);
     }
 
     Polynomial *R = copy_polynomial(A);
@@ -118,8 +135,9 @@ double poly_calculate(Polynomial *p, double value) {
     return result;
 }
 
+// Calculate cauchy bound
 double cauchy_bound(Polynomial*p){
-    if (p->degree = 0) {
+    if (p->degree == 0) {
         return 0.0;
     }
 
@@ -136,6 +154,7 @@ double cauchy_bound(Polynomial*p){
     return max+1;
 }
 
+// Calculate the number of sign changes
 int nb_sign_change(double*l,int n){
     int nb=0;
     for(int i=1;i<n;i++){

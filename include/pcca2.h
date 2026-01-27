@@ -25,6 +25,9 @@ Polynomial* copy_polynomial(const Polynomial *p);
 // Generate a random polynomial with coefficients in [min, max]
 Polynomial* generate_random_polynomial(int degree, double min, double max);
 
+// afficher the result of the sturm
+void afficher_bound(const double* bound);
+
 // Calculate the derivative of the polynomial
 Polynomial* poly_derivative(Polynomial *p);
 
@@ -39,7 +42,6 @@ double poly_calculate(Polynomial *p, double value);
 double cauchy_bound(Polynomial*p);
 
 int nb_sign_change(double*l,int n);
-
 
 // function for sturm naif
 double* bound_recu(Polynomial**sturmSuite, int nbSuite,double inf, double sup);
