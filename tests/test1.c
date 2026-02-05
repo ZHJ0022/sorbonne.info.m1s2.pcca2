@@ -1,6 +1,7 @@
 #include "../include/pcca2.h"
 
 int main(void) {
+    srand(0);
     // ---------- Test 1: (x+1)(x+2)(x+3) = x^3 + 6x^2 + 11x + 6 ----------
     Polynomial* p1 = create_polynomial(3);
     p1->coeffs[0] = 6;
@@ -14,18 +15,7 @@ int main(void) {
     free(b1);
     free_polynomial(p1);
 
-    // ---------- Test 2: (x-2)(x-4)(x-6)(x-8)(x-10) ----------
-    /*
-    Polynomial* p2 = create_polynomial(5);
-    p2->coeffs[0] = -3840;
-    p2->coeffs[1] = 4384;
-    p2->coeffs[2] = -1800;
-    p2->coeffs[3] = 340;
-    p2->coeffs[4] = -30;
-    p2->coeffs[5] = 1;
-
-    printf("\n=== Test 2: (x-2)(x-4)(x-6)(x-8)(x-10) ===\n");
-    */
+    // ---------- Test 2: (x-1)(x-1) ----------
     Polynomial* p2 = create_polynomial(2);
     p2->coeffs[0] = 1;
     p2->coeffs[1] = -2;
@@ -55,6 +45,36 @@ int main(void) {
     afficher_bound(b3);
     free(b3);
     free_polynomial(p3);
+
+    // ---------- Test 4: (x-2)(x-4)(x-6)(x-8)(x-10) ----------
+
+    Polynomial* p4 = create_polynomial(5);
+    p4->coeffs[0] = -3840;
+    p4->coeffs[1] = 4384;
+    p4->coeffs[2] = -1800;
+    p4->coeffs[3] = 340;
+    p4->coeffs[4] = -30;
+    p4->coeffs[5] = 1;
+
+    printf("\n=== Test 4: (x-2)(x-4)(x-6)(x-8)(x-10) ===\n");
+    double* b4 = sturm_naif(p4);
+    afficher_bound(b4);
+    free(b4);
+    free_polynomial(p4);
+    
+    //=== Test 5: random polynomial (degree = 20) ===
+    Polynomial*p5=generate_random_polynomial(20,-1000,1000);
+    printf("\n=== Test 5: random polynomial degree 20 ===\n");
+    double* b5 = sturm_naif(p5);
+    if(verify_interval(b5,p5)==0){
+        printf("result correct\n");
+    }else{
+        printf("result wrong\n");
+    }
+    free(b5);
+    free_polynomial(p5);
+
+
 
     return 0;
 }
