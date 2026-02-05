@@ -12,15 +12,17 @@ Polynomial* create_polynomial(int degree) {
         return NULL;
     }
 
+    p->roots = NULL;
+    p->nroots = 0;
+
     return p;
 }
 
 // Free polynomial memory
 void free_polynomial(Polynomial *p) {
     if (p) {
-        if (p->coeffs) {
-            free(p->coeffs);
-        }
+        if (p->coeffs) free(p->coeffs);
+        if (p->roots)  free(p->roots);
         free(p);
     }
 }
@@ -33,22 +35,87 @@ Polynomial* copy_polynomial(const Polynomial *p) {
     if (!copy) return NULL;
 
     memcpy(copy->coeffs, p->coeffs, (p->degree + 1) * sizeof(double));
+
+    copy->nroots = p->nroots;
+    if (p->nroots > 0 && p->roots) {
+        copy->roots = (double*)malloc(p->nroots * sizeof(double));
+
+        if (!copy->roots) {
+            free_polynomial(copy);
+            return NULL;
+        }
+
+        memcpy(copy->roots, p->roots, p->nroots * sizeof(double));
+    }
+
     return copy;
 }
 
-// Generate a random polynomial
-Polynomial* generate_random_polynomial(int degree, double min, double max) {
-    Polynomial *p = create_polynomial(degree);
+Polynomial* poly_mul_naive(Polynomial *A, Polynomial *B) {
+    Polynomial *C = create_polynomial(A->degree + B->degree);
+    if (!C) return NULL;
+
+    for (int i = 0; i <= A->degree; i++) {
+        for (int j = 0; j <= B->degree; j++) {
+            C->coeffs[i + j] += A->coeffs[i] * B->coeffs[j];
+        }
+    }
+    return C;
+}
+
+// Generate polynomial from n random real roots in [a,b]:
+// P(x) = (x - r_1)(x - r_2)...(x - r_n), degree = n
+Polynomial* generate_random_polynomial(int n, double a, double b) {
+    if (n < 0) return NULL;
+
+    Polynomial *p = create_polynomial(n);
     if (!p) return NULL;
 
-    for (int i = 0; i <= degree; i++) {
-        // Generate a random number in the range [min, max]
-        double random = (double)rand() / RAND_MAX;
-        p->coeffs[i] = min + random * (max - min);
+    // allocate roots
+    p->roots = (double*)malloc(n * sizeof(double));
+    if (n > 0 && !p->roots) {
+        free_polynomial(p);
+        return NULL;
     }
+    p->nroots = n;
+
+    // temp stores the calculation results and updates p.
+    double *temp = (double*)malloc((n + 1) * sizeof(double));
+    if (!temp) {
+        free_polynomial(p);
+        return NULL;
+    }
+
+    p->coeffs[0] = 1.0;
+
+    for (int k = 0; k < n; k++) {
+        double r = a + ((double)rand() / RAND_MAX) * (b - a);
+        p->roots[k] = r;
+
+        // Initialize temp(result) to 0
+        for (int i = 0; i <= n; i++) {
+            temp[i] = 0.0;
+        }
+
+        for (int i = 0; i <= k; i++) {
+            temp[i] += (-r) * p->coeffs[i];
+        }
+
+        for (int i = 0; i <= k; i++) {
+            temp[i + 1] += 1 * p->coeffs[i];
+        }
+
+        // copy the result
+        for (int i = 0; i <= k + 1; i++) {
+            p->coeffs[i] = temp[i];
+        }
+    }
+
+    free(temp);
 
     return p;
 }
+
 
 // afficher the result of the sturm
 void afficher_bound(const double* bound) {
@@ -103,11 +170,14 @@ Polynomial* poly_remainder(Polynomial *A,Polynomial *B) {
 
         // R = R - c * x^k * B
         for (int i = 0; i <= B->degree; i++) {
+            if (i + k > A->degree){
+                printf("remainder overflow error");
+            }
             R->coeffs[i + k] -= c * B->coeffs[i];
         }
 
         // update degree
-        while (R->degree > 0 && R->coeffs[R->degree] == 0.0) {
+        while (R->degree > 0 && fabs(R->coeffs[R->degree]) < EPSILON) {
             R->degree--;
         }
     }
@@ -155,13 +225,52 @@ double cauchy_bound(Polynomial*p){
 }
 
 // Calculate the number of sign changes
-int nb_sign_change(double*l,int n){
-    int nb=0;
-    for(int i=1;i<n;i++){
-        if(l[i-1]*l[i]<0){
+int nb_sign_change(double *l, int n) {
+    int nb = 0;
+
+    double curr,next;
+    int index=0;
+    curr=l[index];
+
+    while (index < n && l[index] ==0.0 ) {
+        index++;
+    }
+    if (index >= n) return 0;
+
+    curr = l[index];
+
+    for (int i = index+1; i < n; i++) {
+        if (l[i] == 0.0){
+            continue;
+        }
+
+        next=l[i];
+        if(curr*next<0){
             nb++;
         }
+        curr=next;
+
     }
 
     return nb;
+}
+
+// Return 1 if the result is incorrect, and 0 if the result is correct.
+int verify_interval(double *bound, Polynomial *p){
+    int n = (int)bound[0];
+
+    for (int k = 0; k < p->nroots; k++) {
+        double r = p->roots[k];
+        int found = 0;
+
+        for (int i = 1; i <= n; i++) {
+            double a = bound[2*i - 1];
+            double b = bound[2*i];
+            if (r >= a && r <= b){
+                found = 1; break;
+            }
+        }
+        if (!found) return 1;
+    }
+    return 0;
 }

@@ -6,11 +6,16 @@
 #include <string.h>
 #include <math.h>
 
+#define EPSILON 1e-12
+
 // Polynomial structure
 // coeffs[i] represents the coefficient of x^i
 typedef struct {
-    double *coeffs;    // Coefficient array
-    int degree;        // Degree of the polynomial
+    double *coeffs;   // Coefficient array, size = degree+1, coeffs[i] is x^i coefficient
+    int degree;
+
+    double *roots;    // store roots for verification
+    int nroots;
 } Polynomial;
 
 // Create a polynomial
@@ -23,7 +28,7 @@ void free_polynomial(Polynomial *p);
 Polynomial* copy_polynomial(const Polynomial *p);
 
 // Generate a random polynomial with coefficients in [min, max]
-Polynomial* generate_random_polynomial(int degree, double min, double max);
+Polynomial* generate_random_polynomial(int n, double a, double b);
 
 // afficher the result of the sturm
 void afficher_bound(const double* bound);
@@ -42,6 +47,8 @@ double poly_calculate(Polynomial *p, double value);
 double cauchy_bound(Polynomial*p);
 
 int nb_sign_change(double*l,int n);
+
+int verify_interval(double * bound, Polynomial * p);
 
 // function for sturm naif
 double* bound_recu(Polynomial**sturmSuite, int nbSuite,double inf, double sup);

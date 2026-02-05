@@ -6,6 +6,14 @@
             its interval is given by bound[2*i - 1] and bound[2*i].
 */
 double* bound_recu(Polynomial**sturmSuite, int nbSuite,double inf, double sup){
+    static int depth = 0;
+    depth++;
+    if(depth > 2000){
+        printf("depth too deep\n");
+        return NULL;
+    }
+
+    // printf("Enter [inf: %.15g, sup: %.15g], width: %.15g\n", inf, sup, sup - inf);
 
     double *l1=malloc(sizeof(double)*nbSuite);  // result of inf
     double *l2=malloc(sizeof(double)*nbSuite);  // result of sup
@@ -22,6 +30,7 @@ double* bound_recu(Polynomial**sturmSuite, int nbSuite,double inf, double sup){
 
     int nbRacine=abs(v1-v2);
 
+    // printf("  -> v1: %d, v2: %d, nbRacine: %d\n", v1, v2, nbRacine);
 
     double* bound=malloc(sizeof(double)*(nbRacine*2+1));
     bound[0]=nbRacine;
@@ -31,6 +40,7 @@ double* bound_recu(Polynomial**sturmSuite, int nbSuite,double inf, double sup){
 
     // If there are no real roots, return directly.
     if(nbRacine==0){
+        depth--;
         return bound;
     }
 
@@ -39,8 +49,10 @@ double* bound_recu(Polynomial**sturmSuite, int nbSuite,double inf, double sup){
         -> record the current upper and lower bounds and then return.
      */ 
     if (nbRacine==1){
+        // printf("  SUCCESS: Isolated root in [%.15g, %.15g]\n", inf, sup);
         bound[1]=inf;
         bound[2]=sup;
+        depth--;
         return bound;
     }
 
@@ -57,6 +69,9 @@ double* bound_recu(Polynomial**sturmSuite, int nbSuite,double inf, double sup){
         double* r=bound_recu(sturmSuite,nbSuite,inf+i*h,inf+(i+1)*h);
         if(r[0]>0.0){
             for(int j=0;j<(int)r[0];j++){
+                if (index + 1 > nbRacine * 2) {
+                    printf("bound overflow error");
+                }
                 bound[index]=r[1+j*2];
                 bound[index+1]=r[(j+1)*2];
                 index+=2;
@@ -88,8 +103,11 @@ double* sturm_naif(Polynomial* p){
     //Calculate the suite
     for(int i=1;i<p->degree;i++){
         // Euclidean division
+
+        // printf("Generating Sturm suite index %d...\n", i+1);
         sturmSuite[i+1]=poly_remainder(sturmSuite[i-1],sturmSuite[i]);
 
+        // printf("->Remainder degree: %d\n", sturmSuite[i+1]->degree);
         // -rem()
         poly_negative(sturmSuite[i+1]);
 
