@@ -1,7 +1,7 @@
 #include "../include/pcca2.h"
 
 int main(void) {
-    srand(0);
+    srand((unsigned)time(NULL));
     // ---------- Test 1: (x+1)(x+2)(x+3) = x^3 + 6x^2 + 11x + 6 ----------
     Polynomial* p1 = create_polynomial(3);
     p1->coeffs[0] = 6;
@@ -62,9 +62,9 @@ int main(void) {
     free(b4);
     free_polynomial(p4);
     
-    //=== Test 5: random polynomial (degree = 20) ===
-    Polynomial*p5=generate_random_polynomial(20,-1000,1000);
-    printf("\n=== Test 5: random polynomial degree 20 ===\n");
+    //=== Test 5: random polynomial (degree = 50) ===
+    Polynomial*p5=generate_random_polynomial(50,-100,100);
+    printf("\n=== Test 5: random polynomial degree 50 ===\n");
     double* b5 = sturm_naif(p5);
     if(verify_interval(b5,p5)==0){
         printf("result correct\n");

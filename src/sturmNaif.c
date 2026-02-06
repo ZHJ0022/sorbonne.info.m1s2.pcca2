@@ -9,7 +9,7 @@ double* bound_recu(Polynomial**sturmSuite, int nbSuite,double inf, double sup){
     static int depth = 0;
     depth++;
     if(depth > 2000){
-        printf("depth too deep\n");
+        printf("depth overflow\n");
         return NULL;
     }
 
@@ -70,7 +70,9 @@ double* bound_recu(Polynomial**sturmSuite, int nbSuite,double inf, double sup){
         if(r[0]>0.0){
             for(int j=0;j<(int)r[0];j++){
                 if (index + 1 > nbRacine * 2) {
-                    printf("bound overflow error");
+                    printf("bound overflow error\n");
+                    printf("current interval[%.5f,%.5f], nb roots current: %f\n", inf+i*h,inf+(i+1)*h,r[0]);
+                    printf("parent interval[%.5f,%.5f], nb roots parent: %d\n",inf,sup,nbRacine);
                 }
                 bound[index]=r[1+j*2];
                 bound[index+1]=r[(j+1)*2];

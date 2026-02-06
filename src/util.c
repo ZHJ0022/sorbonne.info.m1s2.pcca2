@@ -89,8 +89,12 @@ Polynomial* generate_random_polynomial(int n, double a, double b) {
     p->coeffs[0] = 1.0;
 
     for (int k = 0; k < n; k++) {
-        double r = a + ((double)rand() / RAND_MAX) * (b - a);
-        p->roots[k] = r;
+        // coeff double
+        // double r = a + ((double)rand() / RAND_MAX) * (b - a);
+
+        // coeff int
+        int r = a + (int)((double)rand() / (RAND_MAX + 1.0) * (b - a + 1));
+        p->roots[k] = (double)r;
 
         // Initialize temp(result) to 0
         for (int i = 0; i <= n; i++) {
@@ -240,12 +244,12 @@ int nb_sign_change(double *l, int n) {
     curr = l[index];
 
     for (int i = index+1; i < n; i++) {
-        if (l[i] == 0.0){
+        if (l[i] == 0){
             continue;
         }
 
         next=l[i];
-        if(curr*next<0){
+        if(curr*next < 0.0){
             nb++;
         }
         curr=next;
