@@ -8,10 +8,12 @@
 double* bound_recu(Polynomial**sturmSuite, int nbSuite,double inf, double sup){
     static int depth = 0;
     depth++;
+    /*
     if(depth > 2000){
         printf("depth overflow\n");
         return NULL;
     }
+    */
 
     // printf("Enter [inf: %.15g, sup: %.15g], width: %.15g\n", inf, sup, sup - inf);
 

@@ -249,7 +249,7 @@ int nb_sign_change(double *l, int n) {
         }
 
         next=l[i];
-        if(curr*next < 0.0){
+        if(curr*next < EPSILON){
             nb++;
         }
         curr=next;

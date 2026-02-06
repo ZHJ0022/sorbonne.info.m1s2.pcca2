@@ -7,7 +7,7 @@
 #include <math.h>
 #include <time.h>
 
-#define EPSILON 1e-63
+#define EPSILON 1e-32
 
 // Polynomial structure
 // coeffs[i] represents the coefficient of x^i
