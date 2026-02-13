@@ -249,15 +249,33 @@ double poly_calculate(Polynomial *p, double value) {
     double x = 1.0;     //x_0
 
     for (int i = 0; i <= p->degree; i++) {
-        result += p->coeffs[i] * x;
-        x *= value;         //x_i+1
-        if (isinf(result)) {
-            printf("[DEBUG] result poly_calculate inf in degree %d",i);
-            return 0;
+        double temp = result;
+        temp += p->coeffs[i] * x;
+        // int nb=0;
+        // || (fabs(value)<1 && fabs(temp) <1e-22) && value !=0)
+        while(isinf(temp)){
+            result /= value*value;
+            x /= value*value;
+            temp = result+p->coeffs[i] * x;
+            /*
+            if(nb>500){
+                printf("boucle infinie poly calculate");
+                break;
+            }
+            
+            nb++;
+            */
         }
+        result=temp;
+        x *= value;
     }
-
-    return result;
+    double sign=0;
+    if(result> EPSILON){
+        sign=1;
+    }else if(result<-EPSILON){
+        sign=-1;
+    }
+    return sign;
 }
 
 // Calculate cauchy bound
@@ -282,18 +300,27 @@ double cauchy_bound(Polynomial*p){
 // Calculate the number of sign changes
 // sign 1 positive, -1 negative, 0 zero
 int nb_sign_change(double *l, int n) {
-int nb = 0;
-    int last_sign = 0;
-    for (int i = 0; i < n; i++) {
-        int s=0;
-        if (l[i] > 0) s=1;
-        if (l[i] < 0) s=-1;
-        if (s == 0) continue;
-        if (last_sign != 0 && s != last_sign) {
+    int nb = 0;
+    double curr,next;
+    int index=0;
+    while (index < n && l[index]==0.0) {
+        index++;
+    }
+    if (index >= n) return 0;
+    curr = l[index];
+
+    for (int i = index+1; i < n; i++) {
+        if (l[i] ==0.0){
+            continue;
+        }
+
+        next=l[i];
+        if(curr*next < 0.0){
             nb++;
         }
-        last_sign = s;
+        curr=next;
     }
+
     return nb;
 }
 
@@ -315,7 +342,7 @@ int nb_sign_changeDebug(double *l, int n) {
             continue;
         }
 
-        next=l[i];
+        next = l[i];
         if(curr*next < -EPSILON){
             double temp=curr*next;
             printf("curr*next=%.5f\n",temp);
@@ -327,7 +354,6 @@ int nb_sign_changeDebug(double *l, int n) {
 
     return nb;
 }
-    
 
 // Return 1 if the result is incorrect, and 0 if the result is correct.
 int verify_interval(double *bound, Polynomial *p){
