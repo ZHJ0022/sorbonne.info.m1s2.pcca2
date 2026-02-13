@@ -7,7 +7,7 @@
 #include <math.h>
 #include <time.h>
 
-#define EPSILON 1e-32
+#define EPSILON 1e-63
 
 // Polynomial structure
 // coeffs[i] represents the coefficient of x^i
@@ -37,6 +37,8 @@ void afficher_bound(const double* bound);
 // Calculate the derivative of the polynomial
 Polynomial* poly_derivative(Polynomial *p);
 
+double normalize_polynomial(Polynomial *p);
+
 // Calculate rem(A,B)
 Polynomial* poly_remainder(Polynomial *A,Polynomial *B);
 
@@ -48,6 +50,8 @@ double poly_calculate(Polynomial *p, double value);
 double cauchy_bound(Polynomial*p);
 
 int nb_sign_change(double*l,int n);
+
+// int nb_sign_changeDebug(double *l, int n);
 
 int verify_interval(double * bound, Polynomial * p);
 

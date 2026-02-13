@@ -117,6 +117,7 @@ Polynomial* generate_random_polynomial(int n, double a, double b) {
 
     free(temp);
 
+    printf("Coeff degree n: %.2f",p->coeffs[n]);
     return p;
 }
 
@@ -156,7 +157,7 @@ Polynomial* poly_derivative(Polynomial *p) {
     return d;
 }
 
-// Calculate rem(A,B)
+/*
 Polynomial* poly_remainder(Polynomial *A,Polynomial *B) {
     if (B->degree == 0) {
         return create_polynomial(0);
@@ -188,6 +189,52 @@ Polynomial* poly_remainder(Polynomial *A,Polynomial *B) {
 
     return R;
 }
+    */
+
+double normalize_polynomial(Polynomial *p) {
+    double max_val = 0.0;
+    for (int i = 0; i <= p->degree; i++) {
+        if (fabs(p->coeffs[i]) > max_val) max_val = fabs(p->coeffs[i]);
+    }
+    if (max_val > 0) {
+        for (int i = 0; i <= p->degree; i++) p->coeffs[i] /= max_val;
+    }
+    return max_val;
+}
+
+Polynomial* poly_remainder(Polynomial *A, Polynomial *B) {
+    if (B->degree == 0 && fabs(B->coeffs[0]) < EPSILON) return NULL;
+
+    double scaleA = normalize_polynomial(A);
+    double scaleB = normalize_polynomial(B);
+
+    Polynomial *R = copy_polynomial(A);
+
+    if (A->degree < B->degree) {
+        for (int i = 0; i <= R->degree; i++) R->coeffs[i] *= scaleA;
+        return R;
+    }
+
+    while (R->degree >= B->degree) {
+        int k = R->degree - B->degree;
+        double c = R->coeffs[R->degree] / B->coeffs[B->degree];
+
+        for (int i = 0; i <= B->degree; i++) {
+            R->coeffs[i + k] -= c * B->coeffs[i];
+        }
+
+        while (R->degree > 0 && fabs(R->coeffs[R->degree]) < EPSILON) {
+            R->coeffs[R->degree] = 0.0;
+            R->degree--;
+        }
+    }
+
+    for (int i = 0; i <= R->degree; i++) {
+        R->coeffs[i] *= scaleA;
+    }
+
+    return R;
+}
 
 void poly_negative(Polynomial *p){
     int k=p->degree+1;
@@ -204,6 +251,10 @@ double poly_calculate(Polynomial *p, double value) {
     for (int i = 0; i <= p->degree; i++) {
         result += p->coeffs[i] * x;
         x *= value;         //x_i+1
+        if (isinf(result)) {
+            printf("[DEBUG] result poly_calculate inf in degree %d",i);
+            return 0;
+        }
     }
 
     return result;
@@ -229,14 +280,30 @@ double cauchy_bound(Polynomial*p){
 }
 
 // Calculate the number of sign changes
+// sign 1 positive, -1 negative, 0 zero
 int nb_sign_change(double *l, int n) {
+int nb = 0;
+    int last_sign = 0;
+    for (int i = 0; i < n; i++) {
+        int s=0;
+        if (l[i] > 0) s=1;
+        if (l[i] < 0) s=-1;
+        if (s == 0) continue;
+        if (last_sign != 0 && s != last_sign) {
+            nb++;
+        }
+        last_sign = s;
+    }
+    return nb;
+}
+
+int nb_sign_changeDebug(double *l, int n) {
     int nb = 0;
 
     double curr,next;
     int index=0;
-    curr=l[index];
 
-    while (index < n && l[index] ==0.0 ) {
+    while (index < n && l[index]==0.0) {
         index++;
     }
     if (index >= n) return 0;
@@ -244,12 +311,14 @@ int nb_sign_change(double *l, int n) {
     curr = l[index];
 
     for (int i = index+1; i < n; i++) {
-        if (l[i] == 0){
+        if (l[i] ==0.0){
             continue;
         }
 
         next=l[i];
-        if(curr*next < EPSILON){
+        if(curr*next < -EPSILON){
+            double temp=curr*next;
+            printf("curr*next=%.5f\n",temp);
             nb++;
         }
         curr=next;
@@ -258,6 +327,7 @@ int nb_sign_change(double *l, int n) {
 
     return nb;
 }
+    
 
 // Return 1 if the result is incorrect, and 0 if the result is correct.
 int verify_interval(double *bound, Polynomial *p){

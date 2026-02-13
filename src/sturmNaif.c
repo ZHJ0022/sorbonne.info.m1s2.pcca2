@@ -30,7 +30,17 @@ double* bound_recu(Polynomial**sturmSuite, int nbSuite,double inf, double sup){
     int v1=nb_sign_change(l1,nbSuite);
     int v2=nb_sign_change(l2,nbSuite);
 
-    int nbRacine=abs(v1-v2);
+    int nbRacine=v1-v2;
+
+    if(nbRacine<0){
+        printf("Error v1,v2: %d,%d\n",v1,v2);
+        
+        printf("v1\n");
+        v1 = nb_sign_changeDebug(l1,nbSuite);
+        printf("v2\n");
+        v1 = nb_sign_changeDebug(l2,nbSuite);
+        
+    }
 
     // printf("  -> v1: %d, v2: %d, nbRacine: %d\n", v1, v2, nbRacine);
 
@@ -75,6 +85,7 @@ double* bound_recu(Polynomial**sturmSuite, int nbSuite,double inf, double sup){
                     printf("bound overflow error\n");
                     printf("current interval[%.5f,%.5f], nb roots current: %f\n", inf+i*h,inf+(i+1)*h,r[0]);
                     printf("parent interval[%.5f,%.5f], nb roots parent: %d\n",inf,sup,nbRacine);
+                    break;
                 }
                 bound[index]=r[1+j*2];
                 bound[index+1]=r[(j+1)*2];
@@ -112,6 +123,7 @@ double* sturm_naif(Polynomial* p){
         sturmSuite[i+1]=poly_remainder(sturmSuite[i-1],sturmSuite[i]);
 
         // printf("->Remainder degree: %d\n", sturmSuite[i+1]->degree);
+
         // -rem()
         poly_negative(sturmSuite[i+1]);
 
@@ -125,6 +137,7 @@ double* sturm_naif(Polynomial* p){
     // cauchy bound
     double sup=cauchy_bound(p);
     double inf=(-1)*sup;
+    printf("cauchy_bound = %.5f, %.5f\n", inf,sup);
     
     double* bound=bound_recu(sturmSuite,nbSuite,inf,sup);
     for(int i=0;i<nbSuite;i++){
