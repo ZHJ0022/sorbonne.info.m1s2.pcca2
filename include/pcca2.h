@@ -4,60 +4,77 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 #include <time.h>
 
-#define EPSILON 1e-63
+#include <gmp.h>
 
 // Polynomial structure
 // coeffs[i] represents the coefficient of x^i
 typedef struct {
-    double *coeffs;   // Coefficient array, size = degree+1, coeffs[i] is x^i coefficient
+    mpq_t* coeffs;   // Coefficient array, size = degree+1, coeffs[i] is x^i coefficient
     int degree;
 
-    double *roots;    // store roots for verification
+    // optional: store roots for verification (keep as double if you want)
+    mpq_t* roots;
     int nroots;
 } Polynomial;
-
+//-------------------------------------------------------
+// methode util
 // Create a polynomial
 Polynomial* create_polynomial(int degree);
 
 // Free polynomial memory
 void free_polynomial(Polynomial *p);
 
-// Copy a polynomial
-Polynomial* copy_polynomial(const Polynomial *p);
+// Free mpq_t*
+void free_bound(mpq_t *bound);
+
+// Copy(deep) a polynomial
+Polynomial* copy_polynomial(Polynomial *p);
 
 // Generate a random polynomial with coefficients in [min, max]
-Polynomial* generate_random_polynomial(int n, double a, double b);
+Polynomial* generate_random_polynomial(int n, long a, long b);
 
 // afficher the result of the sturm
-void afficher_bound(const double* bound);
+void afficher_bound(mpq_t* bound);
+
+//-------------------------------------------------------
+// polynomial operation
+// PC=PA*PB
+Polynomial* poly_mul_naive(Polynomial *A,Polynomial *B);
 
 // Calculate the derivative of the polynomial
 Polynomial* poly_derivative(Polynomial *p);
 
-double normalize_polynomial(Polynomial *p);
+// recalculate the degree of poly
+static void poly_trim_degree(Polynomial *p);
 
 // Calculate rem(A,B)
-Polynomial* poly_remainder(Polynomial *A,Polynomial *B);
+Polynomial* poly_remainder(Polynomial *A, Polynomial *B);
 
+// (-1)*P
 void poly_negative(Polynomial *p);
 
-// Calculate P(value)
-double poly_calculate(Polynomial *p, double value);
+// // Calculate P(value)
+double poly_calculate_sign(Polynomial *p, mpq_t x);
 
-double cauchy_bound(Polynomial*p);
+//-------------------------------------------------------
+// basic calculation methods for sturm
+// Calculate the cauchy bound of the roots of a polynomial
+void cauchy_bound(mpq_t result, Polynomial *p);
 
-int nb_sign_change(double*l,int n);
+// Calculate the number of sign changes in a sequence
+int nb_sign_change(double *l, int n);
 
-// int nb_sign_changeDebug(double *l, int n);
+// Check if the obtained results are correct (a corresponding root can be found for each interval).
+int verify_interval(mpq_t* bound, Polynomial *p);
 
-int verify_interval(double * bound, Polynomial * p);
+//-------------------------------------------------------
+// methods of sturm sequences
+// Find the interval corresponding to the root by splitting the input interval recursively
+mpq_t* bound_recu(Polynomial **sturmSuite, int nbSuite, mpq_t inf, mpq_t sup);
 
-// function for sturm naif
-double* bound_recu(Polynomial**sturmSuite, int nbSuite,double inf, double sup);
-
-double* sturm_naif(Polynomial* p);
+// Find the interval of real roots of a polynomial by sturm
+mpq_t* sturm_naif(Polynomial *p);
 
 #endif

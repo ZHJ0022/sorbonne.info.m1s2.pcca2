@@ -62,9 +62,9 @@ int main(void) {
     free(b4);
     free_polynomial(p4);
     
-    //=== Test 5: random polynomial (degree = 20) ===
-    Polynomial*p5=generate_random_polynomial(20,-10,10);
-    printf("\n=== Test 5: random polynomial degree 20 ===\n");
+    //=== Test 5: random polynomial ===
+    Polynomial*p5=generate_random_polynomial(30,-5,5);
+    printf("\n=== Test 5: random polynomial degree 25 ===\n");
     double* b5 = sturm_naif(p5);
     if(verify_interval(b5,p5)==0){
         printf("result correct\n");
