@@ -47,7 +47,7 @@ Polynomial* poly_mul_naive(Polynomial *A,Polynomial *B);
 Polynomial* poly_derivative(Polynomial *p);
 
 // recalculate the degree of poly
-static void poly_trim_degree(Polynomial *p);
+void poly_trim_degree(Polynomial *p);
 
 // Calculate rem(A,B)
 Polynomial* poly_remainder(Polynomial *A, Polynomial *B);
@@ -61,13 +61,13 @@ double poly_calculate_sign(Polynomial *p, mpq_t x);
 //-------------------------------------------------------
 // basic calculation methods for sturm
 // Calculate the cauchy bound of the roots of a polynomial
-void cauchy_bound(mpq_t result, Polynomial *p);
+void cauchy_bound(mpq_t result, const Polynomial *p);
 
 // Calculate the number of sign changes in a sequence
 int nb_sign_change(double *l, int n);
 
 // Check if the obtained results are correct (a corresponding root can be found for each interval).
-int verify_interval(mpq_t* bound, Polynomial *p);
+int verify_interval(const mpq_t *bound, const Polynomial *p);
 
 //-------------------------------------------------------
 // methods of sturm sequences

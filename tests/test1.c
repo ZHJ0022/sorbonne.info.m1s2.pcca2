@@ -2,6 +2,7 @@
 
 int main(void) {
     srand((unsigned)time(NULL));
+    /*
     // ---------- Test 1: (x+1)(x+2)(x+3) = x^3 + 6x^2 + 11x + 6 ----------
     Polynomial* p1 = create_polynomial(3);
     p1->coeffs[0] = 6;
@@ -62,16 +63,18 @@ int main(void) {
     free(b4);
     free_polynomial(p4);
     
+    */
+
     //=== Test 5: random polynomial ===
-    Polynomial*p5=generate_random_polynomial(30,-5,5);
-    printf("\n=== Test 5: random polynomial degree 25 ===\n");
-    double* b5 = sturm_naif(p5);
+    Polynomial*p5=generate_random_polynomial(40,-50,50);
+    printf("\n=== Test 5: random polynomial degree 40 ===\n");
+    mpq_t* b5 = sturm_naif(p5);
     if(verify_interval(b5,p5)==0){
         printf("result correct\n");
     }else{
         printf("result wrong\n");
     }
-    free(b5);
+    free_bound(b5);
     free_polynomial(p5);
 
 

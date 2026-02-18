@@ -25,7 +25,7 @@ Polynomial* poly_mul_naive(Polynomial *A,Polynomial *B) {
 }
 
 // Calculate the derivative of the polynomial
-Polynomial* poly_derivative(const Polynomial *p) {
+Polynomial* poly_derivative(Polynomial *p) {
     if (p->degree == 0) {
         Polynomial *d = create_polynomial(0);
         if (!d) return NULL;
@@ -55,7 +55,7 @@ Polynomial* poly_derivative(const Polynomial *p) {
     return d;
 }
 
-static void poly_trim_degree(Polynomial *p) {
+void poly_trim_degree(Polynomial *p) {
 
     // p[degree] = 0 -> degree--
     while (p->degree > 0) {
@@ -65,7 +65,7 @@ static void poly_trim_degree(Polynomial *p) {
 }
 
 /* Calculate rem(A,B) */
-Polynomial* poly_remainder(const Polynomial *A, const Polynomial *B) {
+Polynomial* poly_remainder(Polynomial *A, Polynomial *B) {
     // B == 0
     if (!A || !B) return NULL;
 
