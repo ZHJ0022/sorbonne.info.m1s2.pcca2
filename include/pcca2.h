@@ -14,7 +14,7 @@ typedef struct {
     mpq_t* coeffs;   // Coefficient array, size = degree+1, coeffs[i] is x^i coefficient
     int degree;
 
-    // optional: store roots for verification (keep as double if you want)
+    // optional: store roots for verification
     mpq_t* roots;
     int nroots;
 } Polynomial;

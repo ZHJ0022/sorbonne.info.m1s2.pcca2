@@ -75,9 +75,9 @@ mpq_t* bound_recu(Polynomial **sturmSuite, int nbSuite, mpq_t inf, mpq_t sup) {
     mpq_init(ii);
     mpq_init(n_q);
 
-    int n = 2;
+    int n = nbRacine;
     mpq_sub(diff, sup, inf);        // diff = sup - inf
-    mpq_set_si(n_q, n, 1);          // n_q=n=2
+    mpq_set_si(n_q, n, 1);          // n_q=nbRacine
     mpq_div(h, diff, n_q);       // h = diff / n
 
     int index = 1;
