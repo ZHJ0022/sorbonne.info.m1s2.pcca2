@@ -61,20 +61,20 @@ double poly_calculate_sign(Polynomial *p, mpq_t x);
 //-------------------------------------------------------
 // basic calculation methods for sturm
 // Calculate the cauchy bound of the roots of a polynomial
-void cauchy_bound(mpq_t result, const Polynomial *p);
+void cauchy_bound(mpq_t result, Polynomial *p);
 
 // Calculate the number of sign changes in a sequence
 int nb_sign_change(double *l, int n);
 
 // Check if the obtained results are correct (a corresponding root can be found for each interval).
-int verify_interval(const mpq_t *bound, const Polynomial *p);
+int verify_interval(mpq_t *bound, Polynomial *p);
 
 //-------------------------------------------------------
 // methods of sturm sequences
 // Find the interval corresponding to the root by splitting the input interval recursively
-mpq_t* bound_recu(Polynomial **sturmSuite, int nbSuite, mpq_t inf, mpq_t sup);
+mpq_t* bound_recu(Polynomial **sturmSuite, int nbSuite, mpq_t inf, mpq_t sup, int nbI);
 
 // Find the interval of real roots of a polynomial by sturm
-mpq_t* sturm_naif(Polynomial *p);
+mpq_t* sturm_naif(Polynomial *p, int nbI);
 
 #endif

@@ -67,8 +67,11 @@ int main(void) {
 
     //=== Test 5: random polynomial ===
     Polynomial*p5=generate_random_polynomial(40,-50,50);
-    printf("\n=== Test 5: random polynomial degree 40 ===\n");
-    mpq_t* b5 = sturm_naif(p5);
+    printf("\n=== Test 5: random polynomial degree 40s ===\n");
+
+
+    mpq_t* b5 = sturm_naif(p5,3);
+
     if(verify_interval(b5,p5)==0){
         printf("result correct\n");
     }else{

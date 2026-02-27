@@ -88,6 +88,11 @@ Polynomial* poly_remainder(Polynomial *A, Polynomial *B) {
     mpq_init(tmp);
 
     while (R->degree >= B->degree) {
+
+        // time start
+        clock_t start = clock();
+
+        int current_degree = R->degree;
         int k = R->degree - B->degree;
 
         // c = R_lc / B_lc 
@@ -102,8 +107,25 @@ Polynomial* poly_remainder(Polynomial *A, Polynomial *B) {
             mpq_sub(R->coeffs[i + k], R->coeffs[i + k], tmp);
         }
 
+        // // time end
+        clock_t end = clock();
+
         // recalculate and update degree
         poly_trim_degree(R);
+
+
+        double timeCost = (double)(end - start) / CLOCKS_PER_SEC;
+
+        if (R->degree >= 0) {
+            mpz_srcptr num = mpq_numref(R->coeffs[R->degree]);
+            size_t bits = mpz_sizeinbase(num, 2);
+
+            printf("Degree %d:\n", current_degree);
+            printf("Time: %.6f s\n", timeCost);
+            printf("Coeff numerator bits: %zu\n", bits);
+        }
+
+        printf("\n");
     }
 
     mpq_clear(c);

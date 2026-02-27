@@ -5,7 +5,7 @@
     output: bound[0] stores the number of real roots. For each real root i,
             its interval is given by bound[2*i - 1] and bound[2*i].
 */
-mpq_t* bound_recu(Polynomial **sturmSuite, int nbSuite, mpq_t inf, mpq_t sup) {
+mpq_t* bound_recu(Polynomial **sturmSuite, int nbSuite, mpq_t inf, mpq_t sup, int nbI) {
     static int depth = 0;
     depth++;
 
@@ -75,14 +75,21 @@ mpq_t* bound_recu(Polynomial **sturmSuite, int nbSuite, mpq_t inf, mpq_t sup) {
     mpq_init(ii);
     mpq_init(n_q);
 
-    int n = nbRacine;
+    int nbInterval;
+    if(nbI==-1){
+        nbInterval=nbRacine;
+    }else{
+        nbInterval=nbI;
+    }
+
+    // int n = nbRacine;
     mpq_sub(diff, sup, inf);        // diff = sup - inf
-    mpq_set_si(n_q, n, 1);          // n_q=nbRacine
+    mpq_set_si(n_q, nbInterval, 1);          // n_q=nbInterval
     mpq_div(h, diff, n_q);       // h = diff / n
 
     int index = 1;
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < nbInterval; i++) {
         // left = inf + i*h
         mpq_set(left, inf);
         mpq_set_si(ii, i, 1);
@@ -95,7 +102,7 @@ mpq_t* bound_recu(Polynomial **sturmSuite, int nbSuite, mpq_t inf, mpq_t sup) {
         mpq_mul(tmp, h, ii);
         mpq_add(right, right, tmp);
 
-        mpq_t *r = bound_recu(sturmSuite, nbSuite, left, right);
+        mpq_t *r = bound_recu(sturmSuite, nbSuite, left, right,nbI);
         if (r) {
             int rn = mpz_get_si(mpq_numref(r[0]));
             if (rn > 0) {
@@ -132,7 +139,7 @@ mpq_t* bound_recu(Polynomial **sturmSuite, int nbSuite, mpq_t inf, mpq_t sup) {
 
 */ 
 
-mpq_t* sturm_naif(Polynomial *p){
+mpq_t* sturm_naif(Polynomial *p, int nbI){
     int nbSuite = p->degree+1;
     // List of Polynomial objects representing the Sturm suite.
     Polynomial **sturmSuite = malloc(sizeof(Polynomial*) * nbSuite);
@@ -182,8 +189,12 @@ mpq_t* sturm_naif(Polynomial *p){
     gmp_printf("%Qd", sup);
     printf("\n");
 */
+    clock_t start = clock();
+    mpq_t *bound = bound_recu(sturmSuite, nbSuite, inf, sup, nbI);
+    clock_t end = clock();
 
-    mpq_t *bound = bound_recu(sturmSuite, nbSuite, inf, sup);
+    double timeCost = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("Time cost for function bound: %.6f s\n", timeCost);
 
     // free sturm suite
     for (int i = 0; i < nbSuite; i++) {

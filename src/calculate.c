@@ -1,9 +1,11 @@
 #include "../include/pcca2.h"
 
 // Calculate cauchy bound
-void cauchy_bound(mpq_t result, const Polynomial *p) {
+void cauchy_bound(mpq_t result, Polynomial *p) {
     // default result = 0
     mpq_set_si(result, 0, 1);
+
+    poly_trim_degree(p);
 
     if (!p || p->degree == 0) {
         return;
@@ -74,7 +76,7 @@ int nb_sign_change(double *l, int n) {
 }
 
 // Return 1 if the result is incorrect, and 0 if the result is correct.
-int verify_interval(const mpq_t *bound, const Polynomial *p) {
+int verify_interval(mpq_t *bound, Polynomial *p) {
 
     if (!bound || !p) return 1;
 
