@@ -8,6 +8,10 @@
 
 #include <gmp.h>
 
+#include <flint/fmpq.h>
+#include <flint/fmpq_poly.h>
+
+
 // Polynomial structure
 // coeffs[i] represents the coefficient of x^i
 typedef struct {
@@ -55,8 +59,14 @@ Polynomial* poly_remainder(Polynomial *A, Polynomial *B);
 // (-1)*P
 void poly_negative(Polynomial *p);
 
-// // Calculate P(value)
+// Calculate P(value) with Hornor
 double poly_calculate_sign(Polynomial *p, mpq_t x);
+
+// Convert Polynomial to fmpq_poly_t
+void polynomialConv(fmpq_poly_t poly, Polynomial *p);
+
+// Calculate P(value) with FLINT
+int poly_sign_flint(fmpq_poly_t poly, mpq_t x);
 
 //-------------------------------------------------------
 // basic calculation methods for sturm

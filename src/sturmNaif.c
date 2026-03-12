@@ -18,13 +18,31 @@ mpq_t* bound_recu(Polynomial **sturmSuite, int nbSuite, mpq_t inf, mpq_t sup, in
         return NULL;
     }
 
+    // clock_t start = clock();
     // Calculate the sign
     for (int i = 0; i < nbSuite; i++) {
+
+        /*
+        // methode Hornor
         l1[i] = poly_calculate_sign(sturmSuite[i], inf);
         l2[i] = poly_calculate_sign(sturmSuite[i], sup);
-    }
+        */
 
-    // Calculate the number of sign changes
+        // methode FLINT
+        fmpq_poly_t poly;
+        polynomialConv(poly, sturmSuite[i]);
+
+        l1[i] = poly_sign_flint(poly, inf);
+        l2[i] = poly_sign_flint(poly, sup);
+
+        fmpq_poly_clear(poly);
+        
+    }
+    // clock_t end = clock();
+    // double timeCost = (double)(end - start) / CLOCKS_PER_SEC;
+    // printf("Time for calculate polynomial: %.6f s\n", timeCost);
+
+    // Calculate the number of sign changes 
     int v1 = nb_sign_change(l1, nbSuite);
     int v2 = nb_sign_change(l2, nbSuite);
     int nbRacine = v1 - v2;

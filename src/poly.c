@@ -144,7 +144,7 @@ void poly_negative(Polynomial *p) {
     }
 }
 
-// Calculate P(value)
+// Calculate P(value) with Hornor
 // return sign of P(x): -1.0, 0.0, +1.0 
 double poly_calculate_sign(Polynomial *p, mpq_t x) {
     if (!p) return 0.0;
@@ -153,7 +153,7 @@ double poly_calculate_sign(Polynomial *p, mpq_t x) {
     mpq_init(acc);
     mpq_set_si(acc, 0, 1);
 
-    // method Honor
+    // method Hornor
     for (int i = p->degree; i >= 0; i--) {
         mpq_mul(acc, acc, x);
         mpq_add(acc, acc, p->coeffs[i]);
@@ -166,4 +166,41 @@ double poly_calculate_sign(Polynomial *p, mpq_t x) {
     if (s > 0) return 1.0;
     if (s < 0) return -1.0;
     return 0.0;
+}
+
+// Convert Polynomial to fmpq_poly_t
+void polynomialConv(fmpq_poly_t poly, Polynomial *p)
+{
+    fmpq_poly_init(poly);
+
+    for (int i = 0; i <= p->degree; i++) {
+        fmpq_t c;
+        fmpq_init(c);
+
+        fmpq_set_mpq(c, p->coeffs[i]);
+        fmpq_poly_set_coeff_fmpq(poly, i, c);
+
+        fmpq_clear(c);
+    }
+}
+
+// Calculate P(value) with FLINT
+// return sign of P(x): -1.0, 0.0, +1.0 
+int poly_sign_flint(fmpq_poly_t poly, mpq_t x)
+{
+    fmpq_t fx, res;
+
+    fmpq_init(fx);
+    fmpq_init(res);
+
+    fmpq_set_mpq(fx, x);
+
+    fmpq_poly_evaluate_fmpq(res, poly, fx);
+
+    int s = fmpq_sgn(res);
+
+    fmpq_clear(res);
+    fmpq_clear(fx);
+
+    return s;
 }

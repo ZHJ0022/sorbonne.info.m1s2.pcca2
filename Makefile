@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -g
 INCLUDES = -Iinclude
-LDLIBS = -lgmp -lm
+LDLIBS = -lflint -lgmp -lm
 
 BUILD_DIR = build
 SRC=src/sturmNaif.c \
