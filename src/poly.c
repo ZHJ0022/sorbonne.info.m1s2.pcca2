@@ -90,7 +90,7 @@ Polynomial* poly_remainder(Polynomial *A, Polynomial *B) {
     while (R->degree >= B->degree) {
 
         // time start
-        clock_t start = clock();
+        // clock_t start = clock();
 
         int current_degree = R->degree;
         int k = R->degree - B->degree;
@@ -108,24 +108,28 @@ Polynomial* poly_remainder(Polynomial *A, Polynomial *B) {
         }
 
         // // time end
-        clock_t end = clock();
+        // clock_t end = clock();
 
         // recalculate and update degree
         poly_trim_degree(R);
 
 
-        double timeCost = (double)(end - start) / CLOCKS_PER_SEC;
+        // double timeCost = (double)(end - start) / CLOCKS_PER_SEC;
 
+        /*
         if (R->degree >= 0) {
             mpz_srcptr num = mpq_numref(R->coeffs[R->degree]);
+            
             size_t bits = mpz_sizeinbase(num, 2);
 
             printf("Degree %d:\n", current_degree);
             printf("Time: %.6f s\n", timeCost);
             printf("Coeff numerator bits: %zu\n", bits);
+            
         }
+            */
 
-        printf("\n");
+        // printf("\n");
     }
 
     mpq_clear(c);
@@ -203,4 +207,54 @@ int poly_sign_flint(fmpq_poly_t poly, mpq_t x)
     fmpq_clear(fx);
 
     return s;
+}
+
+// 0-> poly non-zero, 1->zero
+int poly_is_zero(const Polynomial *p)
+{
+    for (int i = 0; i <= p->degree; i++) {
+        if (mpq_sgn(p->coeffs[i]) != 0)
+            return 0;
+    }
+    return 1;
+}
+
+// get the lcoef
+void poly_get_lc(mpq_t out, const Polynomial *p)
+{
+    mpq_set(out, p->coeffs[p->degree]);
+}
+
+// 0-> non monic, 1-> monic(lcoef=1)
+int poly_is_monic(const Polynomial *p)
+{
+    if (p->degree < 0)
+        return 0;
+
+    return mpq_cmp_ui(p->coeffs[p->degree], 1, 1) == 0;
+}
+
+// all coef*c
+void poly_scalar_mul(Polynomial *p, mpq_t c)
+{
+    for (int i = 0; i <= p->degree; i++) {
+        mpq_mul(p->coeffs[i], p->coeffs[i], c);
+    }
+    
+    poly_trim_degree(p);
+    return p;
+}
+
+// all coef/c
+int poly_scalar_div_exact(Polynomial *p, const mpq_t c)
+{
+    if (mpq_sgn(c) == 0)
+        return -1;
+
+    for (int i = 0; i <= p->degree; i++) {
+        mpq_div(p->coeffs[i], p->coeffs[i], c);
+    }
+
+    poly_trim_degree(p);
+    return 0;
 }
