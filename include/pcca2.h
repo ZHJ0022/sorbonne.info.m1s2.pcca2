@@ -8,6 +8,9 @@
 
 #include <gmp.h>
 
+
+#include <flint/flint.h>
+#include <flint/fmpz.h>  
 #include <flint/fmpq.h>
 #include <flint/fmpq_poly.h>
 #include <flint/fmpq_mat.h>
@@ -115,18 +118,24 @@ mpq_t** alloc_matrix(int rows, int cols);
 void free_matrix(mpq_t **M, int rows, int cols);
 
 // create Sylvester matrix of P and S
-mpq_t** create_sylv_j_matrix(Polynomial *P, Polynomial *S, int j, int *out_rows, int *out_cols);
+mpq_t** create_sylv_j_matrix(Polynomial *P, int p, Polynomial *S, int s, int j, int *out_rows, int *out_cols);
 
 // convert mpq_t(GMP) to fmpq_t(FLINT)
-static void mpq_to_fmpq(fmpq_t y, const mpq_t x);
+void mpq_to_fmpq(fmpq_t y, const mpq_t x);
 
 // convert fmpq_t(FLINT) to mpq_t(GMP)
-static void fmpq_to_mpq(mpq_t y, const fmpq_t x);
+void fmpq_to_mpq(mpq_t y, const fmpq_t x);
 
 // calculate the determinants of sylv matirx
 void sylv_j_det(mpq_t out, mpq_t **M, int rows, int cols, int d);
 
 // calculate the coefficients of the poly by the determinants of sylv matrix
-Polynomial* subresultant_j(Polynomial *P, Polynomial *S, int j);
+Polynomial* subresultant_j(Polynomial *P, int p, Polynomial *S, int s, int j);
+
+//-------------------------------------------------------
+// (sturmHabicht.c)
+Polynomial** create_sturm_habicht(Polynomial *P);
+
+mpq_t* sturm_habicht(Polynomial *p, int nbI);
 
 #endif

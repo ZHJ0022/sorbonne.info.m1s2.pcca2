@@ -106,3 +106,8 @@ int verify_interval(mpq_t *bound, Polynomial *p) {
 
     return 0;
 }
+
+int delta_sign(int k){
+    int t = (k * (k + 1)) / 2;
+    return (t % 2 == 0) ? 1 : -1;
+}

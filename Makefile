@@ -7,13 +7,16 @@ BUILD_DIR = build
 SRC=src/sturmNaif.c \
     src/util.c \
     src/poly.c \
-    src/calculate.c
+    src/calculate.c \
+    src/sturmHabicht.c \
+    src/subresultant.c
 
 TEST1 = $(BUILD_DIR)/test1
 TEST2 = $(BUILD_DIR)/test2
 TEST3 = $(BUILD_DIR)/test3
+TEST4 = $(BUILD_DIR)/test4
 
-all: $(TEST1) $(TEST2) $(TEST3)
+all: $(TEST1) $(TEST2) $(TEST3) $(TEST4)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
@@ -27,6 +30,10 @@ $(TEST2): $(SRC) tests/test2.c | $(BUILD_DIR)
 $(TEST3): $(SRC) tests/test3.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) $(INCLUDES) $^ -o $@ $(LDLIBS)
 
+$(TEST4): $(SRC) tests/test4.c | $(BUILD_DIR)
+	$(CC) $(CFLAGS) $(INCLUDES) $^ -o $@ $(LDLIBS)
+
+
 run_t1: $(TEST1)
 	@echo "Running test1..."
 	@./$(TEST1)
@@ -39,8 +46,12 @@ run_t3: $(TEST3)
 	@echo "Running test3..."
 	@./$(TEST3)
 
+run_t4: $(TEST4)
+	@echo "Running test4..."
+	@./$(TEST4)
 
-run: run_t1 run_t2 run_t3
+
+run: run_t1 run_t2 run_t3 run_t4
 	@echo "All tests completed!"
 
 clean:

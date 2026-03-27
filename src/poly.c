@@ -92,7 +92,7 @@ Polynomial* poly_remainder(Polynomial *A, Polynomial *B) {
         // time start
         // clock_t start = clock();
 
-        int current_degree = R->degree;
+        // int current_degree = R->degree;
         int k = R->degree - B->degree;
 
         // c = R_lc / B_lc 
@@ -242,11 +242,10 @@ void poly_scalar_mul(Polynomial *p, mpq_t c)
     }
     
     poly_trim_degree(p);
-    return p;
 }
 
 // all coef/c
-int poly_scalar_div_exact(Polynomial *p, const mpq_t c)
+int poly_scalar_div(Polynomial *p, const mpq_t c)
 {
     if (mpq_sgn(c) == 0)
         return -1;

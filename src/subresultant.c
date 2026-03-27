@@ -36,12 +36,9 @@ void free_matrix(mpq_t **M, int rows, int cols)
 }
 
 // create Sylvester matrix of P and S
-mpq_t** create_sylv_j_matrix(Polynomial *P, Polynomial *S, int j,
-                            int *out_rows, int *out_cols)
+mpq_t** create_sylv_j_matrix(Polynomial *P, int p, Polynomial *S, int s, int j,
+                             int *out_rows, int *out_cols)
 {
-    int p = P->degree;
-    int s = S->degree;
-
     int rowsP = s - j;
     int rowsS = p - j;
     int rows = rowsP + rowsS;
@@ -81,7 +78,7 @@ mpq_t** create_sylv_j_matrix(Polynomial *P, Polynomial *S, int j,
 }
 
 // convert mpq_t(GMP) to fmpq_t(FLINT)
-static void mpq_to_fmpq(fmpq_t y, const mpq_t x)
+void mpq_to_fmpq(fmpq_t y, const mpq_t x)
 {
     fmpz_set_mpz(fmpq_numref(y), mpq_numref(x));
     fmpz_set_mpz(fmpq_denref(y), mpq_denref(x));
@@ -89,10 +86,10 @@ static void mpq_to_fmpq(fmpq_t y, const mpq_t x)
 }
 
 // convert fmpq_t(FLINT) to mpq_t(GMP)
-static void fmpq_to_mpq(mpq_t y, const fmpq_t x)
+void fmpq_to_mpq(mpq_t y, const fmpq_t x)
 {
-    mpz_set(mpq_numref(y), fmpz_promote_val(fmpq_numref(x)));
-    mpz_set(mpq_denref(y), fmpz_promote_val(fmpq_denref(x)));
+    fmpz_get_mpz(mpq_numref(y), fmpq_numref(x));
+    fmpz_get_mpz(mpq_denref(y), fmpq_denref(x));
     mpq_canonicalize(y);
 }
 
@@ -117,17 +114,15 @@ void sylv_j_det(mpq_t out, mpq_t **M, int rows, int cols, int d)
     fmpq_mat_clear(A);
 }
 
-Polynomial* subresultant_j(Polynomial *P, Polynomial *S, int j)
+Polynomial* subresultant_j(Polynomial *P, int p, Polynomial *S, int s, int j)
 {
     if (!P || !S) return NULL;
 
-    int p = P->degree;
-    int s = S->degree;
     int minps = (p < s ? p : s);
     if (j < 0 || j >= minps) return NULL;
 
     int rows, cols;
-    mpq_t **M = create_sylv_j_matrix(P, S, j, &rows, &cols);
+    mpq_t **M = create_sylv_j_matrix(P, p, S, s, j, &rows, &cols);
     if (!M) return NULL;
 
     Polynomial *R = create_polynomial(j);
@@ -137,7 +132,7 @@ Polynomial* subresultant_j(Polynomial *P, Polynomial *S, int j)
     }
 
     for (int d = 0; d <= j; d++) {
-        sylv_j_coefficient_det(R->coeffs[d], M, rows, cols, d);
+        sylv_j_det(R->coeffs[d], M, rows, cols, d);
     }
 
     poly_trim_degree(R);
