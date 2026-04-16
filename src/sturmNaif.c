@@ -161,7 +161,7 @@ mpq_t* sturm_naif(Polynomial *p, int nbI){
     int nbSuite = p->degree+1;
     // List of Polynomial objects representing the Sturm suite.
     
-    clock_t start = clock();
+    clock_t start1 = clock();
 
     Polynomial **sturmSuite = malloc(sizeof(Polynomial*) * nbSuite);
     if (!sturmSuite) return NULL;
@@ -196,9 +196,9 @@ mpq_t* sturm_naif(Polynomial *p, int nbI){
         }
     }
 
-    clock_t end = clock();
-    double timeCost = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("Time cost for sturm_naif: %.6f s\n", timeCost);
+    clock_t end1 = clock();
+    double timeCost = (double)(end1 - start1) / CLOCKS_PER_SEC;
+    printf("Time cost for calculate sequence sturm_naif: %.6f s\n", timeCost);
 
 
 
@@ -216,7 +216,11 @@ mpq_t* sturm_naif(Polynomial *p, int nbI){
     gmp_printf("%Qd", sup);
     printf("\n");
 */
+    clock_t start2 = clock();
     mpq_t *bound = bound_recu(sturmSuite, nbSuite, inf, sup, nbI);
+    clock_t end2 = clock();
+    double timeCost2 = (double)(end2 - start2) / CLOCKS_PER_SEC;
+    printf("Time cost for calculate interval sturm_naif: %.6f s\n", timeCost2);
 
     // free sturm suite
     for (int i = 0; i < nbSuite; i++) {

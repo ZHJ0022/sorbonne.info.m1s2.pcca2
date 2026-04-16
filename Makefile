@@ -15,8 +15,9 @@ TEST1 = $(BUILD_DIR)/test1
 TEST2 = $(BUILD_DIR)/test2
 TEST3 = $(BUILD_DIR)/test3
 TEST4 = $(BUILD_DIR)/test4
+TEST5 = $(BUILD_DIR)/test5
 
-all: $(TEST1) $(TEST2) $(TEST3) $(TEST4)
+all: $(TEST1) $(TEST2) $(TEST3) $(TEST4) $(TEST5)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
@@ -33,6 +34,8 @@ $(TEST3): $(SRC) tests/test3.c | $(BUILD_DIR)
 $(TEST4): $(SRC) tests/test4.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) $(INCLUDES) $^ -o $@ $(LDLIBS)
 
+$(TEST5): $(SRC) tests/test5.c | $(BUILD_DIR)
+	$(CC) $(CFLAGS) $(INCLUDES) $^ -o $@ $(LDLIBS)
 
 run_t1: $(TEST1)
 	@echo "Running test1..."
@@ -50,8 +53,11 @@ run_t4: $(TEST4)
 	@echo "Running test4..."
 	@./$(TEST4)
 
+run_t5: $(TEST5)
+	@echo "Running test5..."
+	@./$(TEST5)
 
-run: run_t1 run_t2 run_t3 run_t4
+run: run_t1 run_t2 run_t3 run_t4 run_t5
 	@echo "All tests completed!"
 
 clean:

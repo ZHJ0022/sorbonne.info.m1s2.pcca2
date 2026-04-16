@@ -1,42 +1,51 @@
 #include "../include/pcca2.h"
 
-int main(void){
+void run_random_test(int case_id, int degree, long a, long b, int nbI) {
+    printf("\n==================================================\n");
+    printf("Random polynomial test #%d\n", case_id);
+    printf("degree = %d, roots in [%ld, %ld], nbI = %d\n", degree, a, b, nbI);
+    printf("==================================================\n");
 
-        clock_t start1 = clock();
-        Polynomial*p=generate_random_polynomial(40,-100,100);
-        clock_t end1 = clock();
+    clock_t start_gen = clock();
+    Polynomial *p = generate_random_polynomial(degree, a, b);
+    clock_t end_gen = clock();
 
-        double time1 = (double)(end1 - start1) / CLOCKS_PER_SEC;
-        printf("Time generate polynomial: %.6f s\n",time1);
+    double time_gen = (double)(end_gen - start_gen) / CLOCKS_PER_SEC;
+    printf("Time to generate polynomial: %.6f s\n", time_gen);
 
-        int nbSuite = p->degree+1;
+    // sturm naif
+    printf("\nNaive Sturm\n");
+    mpq_t *b1 = sturm_naif(p, nbI);
+    if (verify_interval(b1, p) == 0)
+        printf("Naive Sturm: result correct\n");
+    else
+        printf("Naive Sturm: result wrong\n");
+    free_bound(b1);
 
-        Polynomial **sturmSuite = malloc(sizeof(Polynomial*) * nbSuite);
+    //sturm habicht
+    printf("\nSturm-Habicht\n");
+    mpq_t *b2 = sturm_habicht(p, nbI);
+    if (verify_interval(b2, p) == 0)
+        printf("Sturm-Habicht: result correct\n");
+    else
+        printf("Sturm-Habicht: result wrong\n");
+    free_bound(b2);
 
-        sturmSuite[0] = copy_polynomial(p);
-        sturmSuite[1] = poly_derivative(p);  
+    free_polynomial(p);
+}
 
-        for (int i = 1; i < p->degree; i++) {
+int main(void) {
+    srand((unsigned)time(NULL));
 
-            printf("Sturm suite [%d]: \n",i);
-            sturmSuite[i + 1] = poly_remainder(sturmSuite[i - 1], sturmSuite[i]);
+    const int degree = 40;
+    const long a = -100;
+    const long b = 100;
+    const int nbI = 3;
+    const int ntests = 5;
 
-            // -rem()
-            poly_negative(sturmSuite[i + 1]);
+    for (int i = 1; i <= ntests; i++) {
+        run_random_test(i, degree, a, b, nbI);
+    }
 
-            // if the degree of the remainder = 0, stop calculate
-            if (sturmSuite[i + 1]->degree == 0) {
-                nbSuite = i + 2;
-                break;
-            }
-        }
-
-        // free sturm suite
-        for (int i = 0; i < nbSuite; i++) {
-            free_polynomial(sturmSuite[i]);
-        }
-        free(sturmSuite);
-        free_polynomial(p);
-
-
+    return 0;
 }

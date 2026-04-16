@@ -1,86 +1,86 @@
 #include "../include/pcca2.h"
 
-int main(void) {
-    srand((unsigned)time(NULL));
-    /*
-    // ---------- Test 1: (x+1)(x+2)(x+3) = x^3 + 6x^2 + 11x + 6 ----------
-    Polynomial* p1 = create_polynomial(3);
-    p1->coeffs[0] = 6;
-    p1->coeffs[1] = 11;
-    p1->coeffs[2] = 6;
-    p1->coeffs[3] = 1;
+Polynomial* generate_structured_polynomial(int n) {
+    if (n <= 0) return NULL;
 
-    printf("=== Test 1: (x+1)(x+2)(x+3) ===\n");
-    double* b1 = sturm_naif(p1);
-    afficher_bound(b1);
-    free(b1);
-    free_polynomial(p1);
+    Polynomial *current = create_polynomial(0);
+    if (!current) return NULL;
+    mpq_set_si(current->coeffs[0], 1, 1);
 
-    // ---------- Test 2: (x-1)(x-1) ----------
-    Polynomial* p2 = create_polynomial(2);
-    p2->coeffs[0] = 1;
-    p2->coeffs[1] = -2;
-    p2->coeffs[2] = 1;
-    printf("\n=== Test 2: (x-1)(x-1)===\n");
-    double* b2 = sturm_naif(p2);
-    afficher_bound(b2);
-    free(b2);
-    free_polynomial(p2);
+    for (int k = 1; k <= n; k++) {
+        // factor = x - k
+        Polynomial *factor = create_polynomial(1);
+        if (!factor) {
+            free_polynomial(current);
+            return NULL;
+        }
+        mpq_set_si(factor->coeffs[0], -k, 1);
+        mpq_set_si(factor->coeffs[1], 1, 1);
 
-    // ---------- Test 3: (x-1)(x-2)...(x-10) ----------
-    Polynomial* p3 = create_polynomial(10);
-    p3->coeffs[0]  = 3628800;
-    p3->coeffs[1]  = -10628640;
-    p3->coeffs[2]  = 12753576;
-    p3->coeffs[3]  = -8409500;
-    p3->coeffs[4]  = 3416930;
-    p3->coeffs[5]  = -902055;
-    p3->coeffs[6]  = 157773;
-    p3->coeffs[7]  = -18150;
-    p3->coeffs[8]  = 1320;
-    p3->coeffs[9]  = -55;
-    p3->coeffs[10] = 1;
+        Polynomial *next = poly_mul_naive(current, factor);
 
-    printf("\n=== Test 3: (x-1)(x-2)...(x-10) ===\n");
-    double* b3 = sturm_naif(p3);
-    afficher_bound(b3);
-    free(b3);
-    free_polynomial(p3);
+        free_polynomial(current);
+        free_polynomial(factor);
 
-    // ---------- Test 4: (x-2)(x-4)(x-6)(x-8)(x-10) ----------
-
-    Polynomial* p4 = create_polynomial(5);
-    p4->coeffs[0] = -3840;
-    p4->coeffs[1] = 4384;
-    p4->coeffs[2] = -1800;
-    p4->coeffs[3] = 340;
-    p4->coeffs[4] = -30;
-    p4->coeffs[5] = 1;
-
-    printf("\n=== Test 4: (x-2)(x-4)(x-6)(x-8)(x-10) ===\n");
-    double* b4 = sturm_naif(p4);
-    afficher_bound(b4);
-    free(b4);
-    free_polynomial(p4);
-    
-    */
-
-    //=== Test 5: random polynomial ===
-    Polynomial*p5=generate_random_polynomial(40,-50,50);
-    printf("\n=== Test 5: random polynomial degree 40s ===\n");
-
-
-    mpq_t* b5 = sturm_naif(p5,3);
-
-    if(verify_interval(b5,p5)==0){
-        printf("result correct\n");
-    }else{
-        printf("result wrong\n");
+        if (!next) return NULL;
+        current = next;
     }
-    free_bound(b5);
-    free_polynomial(p5);
 
+    // store roots for verify_interval
+    current->nroots = n;
+    current->roots = (mpq_t*)malloc(sizeof(mpq_t) * n);
+    if (!current->roots) {
+        free_polynomial(current);
+        return NULL;
+    }
 
+    for (int i = 0; i < n; i++) {
+        mpq_init(current->roots[i]);
+        mpq_set_si(current->roots[i], i + 1, 1);
+    }
+
+    return current;
+}
+
+void run_structured_test(int n, int nbI) {
+    printf("\n==================================================\n");
+    printf("Structured polynomial: P_%d(x) = (x-1)(x-2)...(x-%d)\n", n, n);
+    printf("degree = %d\n", n);
+    printf("==================================================\n");
+
+    Polynomial *p = generate_structured_polynomial(n);
+
+    // sturm naif
+    printf("\nNaive Sturm\n");
+    mpq_t *b1 = sturm_naif(p, nbI);
+    if (verify_interval(b1, p) == 0)
+        printf("Naive Sturm: result correct\n");
+    else
+        printf("Naive Sturm: result wrong\n");
+    free_bound(b1);
+    
+
+    //sturm habicht
+    printf("\nSturm-Habicht\n");
+    mpq_t *b2 = sturm_habicht(p, nbI);
+    if (verify_interval(b2, p) == 0)
+        printf("Sturm-Habicht: result correct\n");
+    else
+        printf("Sturm-Habicht: result wrong\n");
+    free_bound(b2);
+
+    free_polynomial(p);
+}
+
+int main(void) {
+    int nbI = 3;
+
+    int degrees[] = {5, 10, 15, 20, 25, 30};
+    int ncases = sizeof(degrees) / sizeof(degrees[0]);
+
+    for (int i = 0; i < ncases; i++) {
+        run_structured_test(degrees[i], nbI);
+    }
 
     return 0;
 }

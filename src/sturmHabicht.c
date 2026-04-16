@@ -151,7 +151,7 @@ mpq_t* sturm_habicht(Polynomial *p, int nbI){
     clock_t end = clock();
     
     double timeCost = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("Time cost for sturm_habicht: %.6f s\n", timeCost);
+    printf("Time cost for calculate sequence sturm_habicht: %.6f s\n", timeCost);
 
     if (!sturmHabicht) return NULL;
 
@@ -163,7 +163,13 @@ mpq_t* sturm_habicht(Polynomial *p, int nbI){
     cauchy_bound(sup, p);
     mpq_neg(inf, sup);
 
+    clock_t start2 = clock();
+
     mpq_t *bound = bound_recu(sturmHabicht, nbSuite, inf, sup, nbI);
+    clock_t end2 = clock();
+
+    double timeCost2 = (double)(end2 - start2) / CLOCKS_PER_SEC;
+    printf("Time cost for calculate interval sturm_habicht: %.6f s\n", timeCost2);
 
 
     // free sturm_habicht
