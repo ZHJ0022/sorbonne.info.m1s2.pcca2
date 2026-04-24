@@ -1,6 +1,7 @@
 #include "../include/pcca2.h"
 
 void run_random_test(int case_id, int degree, long a, long b, int nbI) {
+
     printf("\n==================================================\n");
     printf("Random polynomial test #%d\n", case_id);
     printf("degree = %d, roots in [%ld, %ld], nbI = %d\n", degree, a, b, nbI);
@@ -15,20 +16,32 @@ void run_random_test(int case_id, int degree, long a, long b, int nbI) {
 
     // sturm naif
     printf("\nNaive Sturm\n");
+
+    reset_eval_count();
     mpq_t *b1 = sturm_naif(p, nbI);
+
     if (verify_interval(b1, p) == 0)
         printf("Naive Sturm: result correct\n");
     else
         printf("Naive Sturm: result wrong\n");
+    
+    printf("Evaluation count = %llu\n", get_eval_count());
+
     free_bound(b1);
 
     //sturm habicht
     printf("\nSturm-Habicht\n");
+
+    reset_eval_count();
     mpq_t *b2 = sturm_habicht(p, nbI);
+
     if (verify_interval(b2, p) == 0)
         printf("Sturm-Habicht: result correct\n");
     else
         printf("Sturm-Habicht: result wrong\n");
+
+    printf("Evaluation count = %llu\n", get_eval_count());
+    
     free_bound(b2);
 
     free_polynomial(p);

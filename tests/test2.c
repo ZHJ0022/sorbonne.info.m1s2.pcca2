@@ -1,7 +1,7 @@
 #include "../include/pcca2.h"
 
 int main(void){
-    Polynomial*p=generate_random_polynomial(30,-100,100);
+    Polynomial*p=generate_random_polynomial(40,-100,100);
     for(int i=2;i<=10;i++){
         clock_t start = clock();
         mpq_t* boundR = sturm_naif(p,i);

@@ -1,5 +1,7 @@
 #include "../include/pcca2.h"
 
+unsigned long long g_eval_count = 0;
+
 // PC=PA*PB
 Polynomial* poly_mul_naive(Polynomial *A,Polynomial *B) {
     if (!A || !B) return NULL;
@@ -192,6 +194,7 @@ void polynomialConv(fmpq_poly_t poly, Polynomial *p)
 // return sign of P(x): -1.0, 0.0, +1.0 
 int poly_sign_flint(fmpq_poly_t poly, mpq_t x)
 {
+    g_eval_count++;
     fmpq_t fx, res;
 
     fmpq_init(fx);
@@ -256,4 +259,12 @@ int poly_scalar_div(Polynomial *p, const mpq_t c)
 
     poly_trim_degree(p);
     return 0;
+}
+
+void reset_eval_count(void) {
+    g_eval_count = 0;
+}
+
+unsigned long long get_eval_count(void) {
+    return g_eval_count;
 }

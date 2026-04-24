@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <math.h>
 
 #include <gmp.h>
 
@@ -14,6 +15,7 @@
 #include <flint/fmpq.h>
 #include <flint/fmpq_poly.h>
 #include <flint/fmpq_mat.h>
+
 
 // Polynomial structure
 // coeffs[i] represents the coefficient of x^i
@@ -25,6 +27,10 @@ typedef struct {
     mpq_t* roots;
     int nroots;
 } Polynomial;
+
+extern unsigned long long g_eval_count;
+
+
 //-------------------------------------------------------
 // methode util(util.c)
 // Create a polynomial
@@ -85,6 +91,9 @@ void poly_scalar_mul(Polynomial *p, mpq_t c);
 
 // all coef /c
 int poly_scalar_div(Polynomial *p, const mpq_t c);
+
+void reset_eval_count(void);
+unsigned long long get_eval_count(void);
 
 //-------------------------------------------------------
 // basic calculation methods for sturm/sturm havicht (calculate.c)
